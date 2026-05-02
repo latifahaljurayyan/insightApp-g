@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AppInsight – File Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(155deg, #1a0540 0%, #2d0e6e 100%);
+      --sidebar-color: #1a0540;
+      --card-bg: rgba(255, 255, 255, 0.05);
+      --border-color: rgba(255, 255, 255, 0.1);
+      --accent-purple: #7c3aed;
+      --text-muted: #c5b8e8;
+      --danger: #ff4d4d;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg-gradient); color: white; min-height: 100vh; display: flex; }
+
+    .app { display: flex; width: 100%; }
+
+   
+    .sidebar { width: 220px; background: var(--sidebar-color); padding: 25px 15px; display: flex; flex-direction: column; border-right: 1px solid var(--border-color); flex-shrink: 0; }
+    .sidebar h2 { font-family: 'Syne', sans-serif; margin-bottom: 20px; font-size: 20px; color: white; font-weight: 800; }
+    
+    .user-profile-section { display: flex; flex-direction: column; align-items: center; padding: 15px 0; margin-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+    .user-avatar { width: 70px; height: 70px; border-radius: 50%; border: 2px solid var(--accent-purple); padding: 2px; margin-bottom: 12px; object-fit: cover; box-shadow: 0 2px 8px rgba(124, 58, 237, 0.2); transition: 0.3s; cursor: pointer; }
+    .user-avatar:hover { transform: scale(1.05); border-color: #a78bfa; }
+    .user-name { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: white; word-break: break-word; }
+    .user-email { font-size: 11px; color: #a0a0b8; word-break: break-word; }
+
+    .sidebar a { color: var(--text-muted); text-decoration: none; margin: 8px 0; font-size: 14px; padding: 12px 15px; border-radius: 12px; display: block; transition: 0.3s; }
+    .sidebar a.active, .sidebar a:hover { color: white; background: rgba(124, 58, 237, 0.2); }
+
+    /* --- Main Content  --- */
+    .main { flex: 1; padding: 50px; overflow-y: auto; }
+    .header-row { display: flex; justify-content: flex-start; align-items: center; margin-bottom: 40px; }
+    h1 { font-family: 'Syne', sans-serif; font-size: 32px; color: white; }
+
+    /* --- Table Styling  --- */
+    .table-container { background: var(--card-bg); backdrop-filter: blur(20px); border: 1px solid var(--border-color); border-radius: 20px; padding: 20px; overflow: hidden; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { padding: 15px; color: var(--text-muted); font-size: 13px; text-transform: uppercase; border-bottom: 1px solid var(--border-color); }
+    td { padding: 18px 15px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.03); color: white; }
+    tr:hover { background: rgba(255,255,255,0.02); }
+
+    .file-name-cell { display: flex; align-items: center; gap: 12px; font-weight: 600; }
+    .file-icon { color: var(--accent-purple); font-size: 18px; }
+
+    .status-badge { padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; background: rgba(63, 185, 80, 0.1); color: #3fb950; }
+
+    /* Action Buttons */
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .action-btn { background: none; border: 1px solid var(--border-color); color: white; padding: 8px 14px; border-radius: 8px; cursor: pointer; transition: all 0.3s; font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+    .action-btn i { font-size: 12px; }
+    .btn-download { border-color: var(--accent-purple); color: var(--accent-purple); }
+    .btn-download:hover { background: var(--accent-purple); color: white; border-color: var(--accent-purple); box-shadow: 0 4px 12px rgba(124, 58, 237, 0.3); }
+    .btn-delete { border-color: var(--danger); color: var(--danger); }
+    .btn-delete:hover { background: var(--danger); color: white; border-color: var(--danger); box-shadow: 0 4px 12px rgba(255, 77, 77, 0.3); }
+
+    .empty-state { text-align: center; padding: 60px; color: var(--text-muted); }
+  </style>
+</head>
+<body>
+
+  <div class="app">
+    <div class="sidebar">
+      <h2>AppInsight</h2>
+      <div class="user-profile-section">
+        <a href="/profile.html"><img src="/static/Image - Copy/user.png" alt="Profile" class="user-avatar"></a>
+        <span class="user-name" id="userName">User</span>
+        <span class="user-email" id="userEmail">Email</span>
+      </div>
+      <nav>
+        <a href="/dashboard">Sentiment Analysis</a>
+        <a href="/compare">Compare Apps</a>
+        <a href="/upload">Upload Center</a>
+        <a href="/files" class="active">File Library</a>
+      </nav>
+      <div class="logout" style="margin-top:auto;"><a href="/logout" style="color:var(--text-muted); text-decoration:none;">Log Out</a></div>
+    </div>
+
+    <div class="main">
+      <div class="header-row">
+        <h1>File Library</h1>
+      </div>
+
+      <div class="table-container">
+        <table id="fileTable">
+          <thead>
+            <tr>
+              <th>File Name</th>
+              <th>Date Uploaded</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="fileListBody">
+            </tbody>
+        </table>
+        <div id="emptyState" class="empty-state" style="display:none;">
+            <i class="fas fa-folder-open" style="font-size: 40px; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>No files found in your library.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    fetch('/api/profile')
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (!res.success) return;
+        var u = res.user;
+        document.getElementById('userName').textContent  = ((u.first_name || '') + ' ' + (u.last_name || '')).trim() || 'User';
+        document.getElementById('userEmail').textContent = u.email || '';
+      });
+
+    function renderFiles(files) {
+      const tbody = document.getElementById('fileListBody');
+      const emptyState = document.getElementById('emptyState');
+      const table = document.getElementById('fileTable');
+
+      if (!files || files.length === 0) {
+        table.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+      }
+
+      table.style.display = 'table';
+      emptyState.style.display = 'none';
+      tbody.innerHTML = '';
+
+      files.forEach(function(file) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>
+            <div class="file-name-cell">
+              <i class="fas fa-file-csv file-icon"></i>
+              ${file.app_name || file.file_path}
+            </div>
+          </td>
+          <td>${file.uploaded_at ? new Date(file.uploaded_at).toLocaleString() : ''}</td>
+          <td>
+            <div class="actions">
+              <button class="action-btn btn-download" onclick="viewFile(${file.file_id})" title="View Results">
+                <i class="fas fa-chart-bar"></i> View
+              </button>
+              <button class="action-btn btn-delete" onclick="deleteFile(${file.file_id})" title="Delete File">
+                <i class="fas fa-trash"></i> Delete
+              </button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    function deleteFile(fileId) {
+      if (confirm('Are you sure you want to delete this file?')) {
+        fetch('/api/files/' + fileId, { method: 'DELETE' })
+          .then(function(r) { return r.json(); })
+          .then(function(res) {
+            if (res.success) loadFiles();
+          });
+      }
+    }
+
+    function viewFile(fileId) {
+      window.location.href = '/dashboard?file_id=' + fileId;
+    }
+
+    function loadFiles() {
+      fetch('/api/files')
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          renderFiles(res.files || res);
+        });
+    }
+
+    loadFiles();
+  </script>
+</body>
+</html>
