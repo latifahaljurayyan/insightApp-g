@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AppInsight – FAQ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/style-2.css"/>
+</head>
+<body>
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <header>
+    <span class="logo">AppInsight</span>
+    <nav class="navigation">
+      <a href="HomePage.html">Home</a>
+      <a href="FAQ.html">FAQ</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="page-title">Frequently Asked Questions</h1>
+
+    <div class="faq-grid" id="faqGrid"></div>
+
+    <div class="get-started-cta">
+      <h3>Ready to analyze your app reviews?</h3>
+      <p>Upload your reviews file and get instant sentiment insights.</p>
+      <div class="cta-buttons">
+        <a href="signup.html" class="btn">Get Started</a>
+        <a href="login.html" class="btn">Log In</a>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-container">
+      <div class="footer-brand">
+        <div class="logo-title">
+          <img src="/static/Image - Copy/logo app.png" alt="AppInsight Logo" class="footer-img"/>
+          <h3 class="footer-logo">AppInsight</h3>
+        </div>
+        <p>Sentiment Analysis of Mobile App Reviews</p>
+        <a href="#" class="back-to-top">⌃ Back to Top</a>
+      </div>
+      <div class="footer-contact">
+        <h4>Contact Us</h4>
+        <a href="mailto:infoappinsight@gmail.com">infoappinsight@gmail.com</a>
+        <p>We'd love to hear from you!</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2026 AppInsight. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    var DEFAULT_FAQS = [
+      {
+        question: 'What is AppInsight?',
+        answer: 'AppInsight is a web-based dashboard that analyzes user reviews from fashion shopping mobile applications. It helps you understand user sentiment at a glance.'
+      },
+      {
+        question: 'How does AppInsight work?',
+        answer: "It's easy! You upload a file containing app reviews, and AppInsight analyzes the text to produce sentiment results such as positive, negative, or neutral, and a rating from 1 to 5."
+      },
+      {
+        question: 'Which app stores does AppInsight support?',
+        answer: 'AppInsight supports reviews collected from Google Play Store and iOS (Apple App Store), covering the two most widely used mobile platforms.'
+      },
+      {
+        question: 'Who uses AppInsight?',
+        answer: 'AppInsight can be useful to any user who wants to understand what users think about their apps — from indie developers to large product teams.'
+      }
+    ];
+
+    function escHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function renderFaqs(faqs) {
+      var grid = document.getElementById('faqGrid');
+      if (!faqs || !faqs.length) {
+        grid.innerHTML = '<p style="color:rgba(197,184,232,0.6); text-align:center;">No FAQs available at this time.</p>';
+        return;
+      }
+      grid.innerHTML = faqs.map(function(f) {
+        return '<div class="faq-card">'
+          + '<h3>' + escHtml(f.question) + '</h3>'
+          + '<p>' + escHtml(f.answer) + '</p>'
+          + '</div>';
+      }).join('');
+    }
+
+    fetch('/api/faqs')
+      .then(function(r) { return r.json(); })
+      .then(function(faqs) { renderFaqs(faqs); })
+      .catch(function() { renderFaqs(DEFAULT_FAQS); });
+  </script>
+
+</body>
+</html>

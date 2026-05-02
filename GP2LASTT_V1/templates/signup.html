@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AppInsight – Sign Up</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="/static/css/style-2.css"/>
+  <style>
+    .error-msg {
+      display: none;
+      color: #e53e3e;
+      font-size: 0.78rem;
+      margin-top: 5px;
+    }
+
+    .input-error {
+      border-color: #e53e3e !important;
+      box-shadow: 0 0 0 3px rgba(229, 62, 62, 0.13) !important;
+    }
+
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear {
+      display: none !important;
+    }
+
+    /* Password rules list */
+    .pass-rules {
+      list-style: none;
+      margin-top: 8px;
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .pass-rules li {
+      font-size: 0.78rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #e53e3e;
+      transition: color 0.2s;
+    }
+
+    .pass-rules li.ok {
+      color: #38a169;
+    }
+
+    .pass-rules li::before {
+      content: "✕";
+      font-weight: 700;
+      font-size: 0.7rem;
+    }
+
+    .pass-rules li.ok::before {
+      content: "✓";
+    }
+  </style>
+</head>
+
+<body class="form-page">
+
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <div class="card">
+    <a href="HomePage.html" class="back-arrow">&#8249;</a>
+    <div class="card-header">
+      <h2>Create New Account</h2>
+    </div>
+
+    <div class="form-group">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Nora"/>
+      <span class="error-msg" id="nameError">Please enter your name.</span>
+    </div>
+
+    <div class="form-group">
+      <label>Email</label>
+      <input type="email" id="email" placeholder="nora.aljarboua@gmail.com"/>
+      <span class="error-msg" id="emailError">Please enter a valid email.</span>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <div class="input-wrap">
+        <input type="password" id="pass" placeholder="***************" oninput="checkRules()"/>
+        <button class="eye-btn" onclick="toggle('pass', this)">👁️</button>
+      </div>
+      <!-- Rules list -->
+      <ul class="pass-rules" id="passRules">
+        <li id="rule-length">Must be between 8 to 15 characters.</li>
+        <li id="rule-upper">Includes at least one capitalized letter.</li>
+        <li id="rule-number">Includes at least one number.</li>
+      </ul>
+      <span class="error-msg" id="passError">Please fix the password requirements above.</span>
+    </div>
+
+    <button class="btn-primary" onclick="handleSignup()">Sign Up</button>
+
+    <p class="footer-text">Already Registered? <a href="login.html">Login</a></p>
+  </div>
+
+  <div class="page-footer-bar">© 2026 AppInsight. All rights reserved.</div>
+
+  <script>
+    function toggle(id, btn) {
+      const input = document.getElementById(id);
+      if (input.type === 'password') {
+        input.type = 'text';
+        btn.textContent = '👁️⃠';
+      } else {
+        input.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function checkRules() {
+      const val   = document.getElementById('pass').value;
+      const rules = document.getElementById('passRules');
+
+      // Show rules once user starts typing
+      rules.style.display = val.length > 0 ? 'flex' : 'none';
+
+      // Check each rule
+      toggleRule('rule-length', val.length >= 8 && val.length <= 15);
+      toggleRule('rule-upper',  /[A-Z]/.test(val));
+      toggleRule('rule-number', /[0-9]/.test(val));
+    }
+
+    function toggleRule(id, passed) {
+      const el = document.getElementById(id);
+      if (passed) el.classList.add('ok');
+      else        el.classList.remove('ok');
+    }
+
+    function passIsValid() {
+      const val = document.getElementById('pass').value;
+      return val.length >= 8 && val.length <= 15 && /[A-Z]/.test(val) && /[0-9]/.test(val);
+    }
+
+    function handleSignup() {
+      const name  = document.getElementById('name');
+      const email = document.getElementById('email');
+      const pass  = document.getElementById('pass');
+      let valid   = true;
+
+      // Name
+      if (name.value.trim() === '') {
+        name.classList.add('input-error');
+        document.getElementById('nameError').style.display = 'block';
+        valid = false;
+      } else {
+        name.classList.remove('input-error');
+        document.getElementById('nameError').style.display = 'none';
+      }
+
+      // Email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email.value.trim())) {
+        email.classList.add('input-error');
+        document.getElementById('emailError').style.display = 'block';
+        valid = false;
+      } else {
+        email.classList.remove('input-error');
+        document.getElementById('emailError').style.display = 'none';
+      }
+
+      // Password
+      if (!passIsValid()) {
+        pass.classList.add('input-error');
+        document.getElementById('passRules').style.display = 'flex';
+        document.getElementById('passError').style.display = 'block';
+        checkRules(); // highlight which rules failed
+        valid = false;
+      } else {
+        pass.classList.remove('input-error');
+        document.getElementById('passError').style.display = 'none';
+      }
+
+      if (valid) {
+        fetch('/api/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name:     name.value.trim(),
+            email:    email.value.trim(),
+            password: pass.value
+          })
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          if (data.success) {
+            window.location.href = '/login.html';
+          } else {
+            document.getElementById('emailError').textContent = data.error || 'Signup failed.';
+            document.getElementById('emailError').style.display = 'block';
+            email.classList.add('input-error');
+          }
+        })
+        .catch(function() {
+          alert('Server error. Please try again.');
+        });
+      }
+    }
+  </script>
+
+</body>
+</html>
